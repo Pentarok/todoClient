@@ -8,14 +8,14 @@ const TodoApp = () => {
   const traceTask = (e) => {
     setNewTask(e.target.value);
   };
-const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app/'
+var serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
   useEffect(() => {
     console.log(tasks);
   }, [tasks]);
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/todos');
+      const res = await axios.get(`${serverUri}/todos`);
       setTasks(res.data);
     } catch (error) {
       console.log(error);
