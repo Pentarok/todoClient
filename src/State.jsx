@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ThreeDots } from 'react-loader-spinner'; // Import the ThreeDots loader
@@ -8,7 +6,7 @@ const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // Define the server URI
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
 
@@ -25,7 +23,7 @@ const TodoApp = () => {
       day: 'numeric',
       hour: 'numeric',
       minute: 'numeric',
-      hour12: true
+      hour12: true,
     };
     return date.toLocaleString('en-US', options);
   };
@@ -36,25 +34,30 @@ const TodoApp = () => {
 
   const fetchTodos = async () => {
     try {
-      setLoading(true);
+      setLoading(true); // Start loading
       const res = await axios.get(`${serverUri}/todos`);
       setTasks(res.data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
-      setLoading(false);
+      setLoading(false); // End loading
     }
   };
 
   const addTask = async () => {
-    if (newTask.trim() !== "") {
+    if (newTask.trim() !== '') {
       try {
         const res = await axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true });
-        const newTaskObject = { _id: res.data._id, Task: res.data.Task, createdAt: res.data.createdAt, done: res.data.done };
+        const newTaskObject = {
+          _id: res.data._id,
+          Task: res.data.Task,
+          createdAt: res.data.createdAt,
+          done: res.data.done,
+        };
         setTasks((t) => [...t, newTaskObject]);
         setNewTask('');
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -64,16 +67,16 @@ const TodoApp = () => {
       await axios.delete(`${serverUri}/todo/${id}`);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const markAsDone = async (id, done) => {
     try {
       const res = await axios.put(`${serverUri}/todo/${id}/markDone`, { done: !done });
-      setTasks(tasks.map(task => (task._id === id ? res.data : task)));
+      setTasks(tasks.map((task) => (task._id === id ? res.data : task)));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -108,11 +111,28 @@ const TodoApp = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="loader">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="#4fa94d"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="list-container">
-      <h2 className='header'>To-Do List App</h2>
-      <input type="text" value={newTask} placeholder='Enter task...' onChange={traceTask} />
-      <button className='btn add-btn' onClick={addTask}>Add Task</button>
+      <h2 className="header">To-Do List App</h2>
+      <input type="text" value={newTask} placeholder="Enter task..." onChange={traceTask} />
+      <button className="btn add-btn" onClick={addTask}>Add Task</button>
       <table>
         <thead>
           <tr>
@@ -123,49 +143,32 @@ const TodoApp = () => {
           </tr>
         </thead>
         <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan="4" style={{ textAlign: 'center' }}>
-                <ThreeDots
-                  visible={true}
-                  height="80"
-                  width="80"
-                  color="#4fa94d"
-                  radius="9"
-                  ariaLabel="three-dots-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
-              </td>
-            </tr>
+          {tasks.length > 0 ? (
+            tasks.map((task, index) => {
+              const formattedDate = formatDate(task.createdAt);
+              const [day, ...dateParts] = formattedDate.split(', ');
+              return (
+                <tr key={task._id}>
+                  <td>{day}</td>
+                  <td>{dateParts.join(', ')}</td>
+                  <td className="task-cell" style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
+                    {task.Task}
+                  </td>
+                  <td>
+                    <button className="delete-btn" onClick={() => deleteTask(index, task._id)}>Delete</button>
+                    <button className="move" onClick={() => moveTaskUp(index)}>👆</button>
+                    <button className="move" onClick={() => moveTaskDown(index)}>👇</button>
+                    <button className="mark-done-btn" onClick={() => markAsDone(task._id, task.done)}>
+                      {task.done ? 'Undo' : 'Mark as Done'}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
-            tasks.length > 0 ? (
-              tasks.map((task, index) => {
-                const formattedDate = formatDate(task.createdAt);
-                const [day, ...dateParts] = formattedDate.split(', ');
-                return (
-                  <tr key={task._id}>
-                    <td>{day}</td>
-                    <td>{dateParts.join(', ')}</td>
-                    <td className="task-cell" style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
-                      {task.Task}
-                    </td>
-                    <td>
-                      <button className='delete-btn' onClick={() => deleteTask(index, task._id)}>Delete</button>
-                      <button className='move' onClick={() => moveTaskUp(index)}>👆</button>
-                      <button className='move' onClick={() => moveTaskDown(index)}>👇</button>
-                      <button className='mark-done-btn' onClick={() => markAsDone(task._id, task.done)}>
-                        {task.done ? 'Undo' : 'Mark as Done'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="4">You have no tasks yet</td>
-              </tr>
-            )
+            <tr>
+              <td colSpan="4" style={{ textAlign: 'center' }}>You have no tasks yet</td>
+            </tr>
           )}
         </tbody>
       </table>
