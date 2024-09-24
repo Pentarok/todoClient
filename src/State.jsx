@@ -128,7 +128,7 @@ import axios from 'axios';
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
-
+const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
   const traceTask = (e) => {
     setNewTask(e.target.value);
   };
