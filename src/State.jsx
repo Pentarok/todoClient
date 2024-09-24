@@ -226,7 +226,9 @@ const TodoApp = () => {
       console.error("Error updating task order:", error);
     }
   };
-
+if(loading){
+  return <p>Loading</p>
+}
   return (
     <div className="list-container">
       <h2 className='header'>To-Do List App</h2>
