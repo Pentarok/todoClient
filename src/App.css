@@ -1,0 +1,14 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  
+}
+
+
+h1,h2,h3,h4,h5{
+  color: rgb(10, 10, 10);
+}
+span{
+  margin-left: 10px;
+}

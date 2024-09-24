@@ -1,0 +1,127 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(8, 8, 8, 0.87);
+  background-color: #fffbfb;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(248, 248, 248);
+
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+.list-container{
+  text-align: center;
+
+}
+.list-container input{
+  padding: 5px;
+}
+.list-container button{
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.header{
+  color: black;
+}
+.btn{
+   padding: 9px;
+   width: 130px;
+   border-radius: 5px;
+   border: none;
+   margin-left: 5px;
+   cursor: pointer;
+   font-weight: 600;
+}
+
+.add-btn{
+  background-color: hsl(120, 100%, 53%);
+}
+.add-btn:hover{
+  background-color: hsl(120, 100%, 33%);
+}
+.delete-btn{
+  background-color: hsl(11, 100%, 42%);
+}
+.delete-btn:hover{
+  background-color: hsl(11, 100%, 28%);
+}
+.move{
+  background-color: hsl(240, 86%, 45%);
+}
+.move:hover{
+  background-color: hsl(240, 86%, 35%);
+}
+input[type="text"]{
+  font-size: 17px;
+  border: 2px solid hsl(0, 8%, 25%);
+  border-radius: 5px;
+  color: black;
+}
+li{
+ font-size: 17px;
+ font-weight: bold; 
+ padding: 10px;
+ margin-bottom: 10px;
+ background-color: white;
+ border: 3px solid hsl(0, 0%, 80%);
+ border-radius: 5px;
+ display: flex;
+ align-items: center;
+}
+.text{
+  flex: 1;
+}
+.delete-btn, .move{
+padding: 8px 12px;
+font-size: 17px;
+margin-left: 10px;
+}
+
+
+
+
+
+
+
+table {
+  width: 100%; /* Optional: Adjust the table width as needed */
+  border-collapse: collapse; /* Prevents double borders */
+}
+
+th, td {
+  padding: 10px; /* Adds space inside each cell */
+  text-align: center; /* Centers the text in each cell */
+}
+
+td {
+  border: 1px solid #ccc; /* Optional: Add borders to the cells */
+}
+
+.task-cell {
+  min-width: 100px; /* Minimum width for the task cell */
+  text-align: center; /* Center the task text */
+}
