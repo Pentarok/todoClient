@@ -125,7 +125,7 @@ import { ThreeDots } from 'react-loader-spinner'; // Import the ThreeDots spinne
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
-  const [loading, setLoading] = useState(true); // Start loading as true
+  const [loading, setLoading] = useState(false); // Start loading as true
 
   // Define the server URI
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
