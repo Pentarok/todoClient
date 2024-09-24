@@ -129,7 +129,7 @@ const TodoApp = () => {
 
   // Define the server URI
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
-
+  
   const traceTask = (e) => {
     setNewTask(e.target.value);
   };
@@ -154,8 +154,10 @@ const TodoApp = () => {
 
   const fetchTodos = async () => {
     try {
+      setLoadin(true)
       const res = await axios.get(`${serverUri}/todos`);
       setTasks(res.data);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     } finally {
