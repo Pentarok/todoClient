@@ -120,41 +120,35 @@ export default TodoApp;
 
 
 
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
-const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
+
   const traceTask = (e) => {
     setNewTask(e.target.value);
-  };
-
-  useEffect(() => {
-    console.log(tasks);
-  }, [tasks]);
-
-  const fetchTodos = async () => {
-    try {
-      const res = await axios.get(`${serverUri}/todos`);
-      setTasks(res.data);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   useEffect(() => {
     fetchTodos();
   }, []);
 
+  const fetchTodos = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/todos');
+      setTasks(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addTask = async () => {
     if (newTask.trim() !== "") {
       try {
-        const res = await axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true });
-        const newTaskObject = { _id: res.data._id, Task: res.data.Task, createdAt: res.data.createdAt };
+        const res = await axios.post('http://localhost:3000/todo', { newTask }, { withCredentials: true });
+        const newTaskObject = { _id: res.data._id, Task: res.data.Task, createdAt: res.data.createdAt, done: res.data.done };
         setTasks((t) => [...t, newTaskObject]);
         setNewTask('');
       } catch (error) {
@@ -165,47 +159,20 @@ const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
 
   const deleteTask = async (index, id) => {
     try {
-      await axios.delete(`${serverUri}/todo/${id}`);
+      await axios.delete(`http://localhost:3000/todo/${id}`);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
       console.log(error);
     }
   };
 
-  const moveTaskUp = async (index) => {
-    if (index > 0) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index - 1]] = [updatedTasks[index - 1], updatedTasks[index]];
-      setTasks(updatedTasks);
-      await updateTaskOrderInDB(updatedTasks);
-    }
-  };
-
-  const moveTaskDown = async (index) => {
-    if (index < tasks.length - 1) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index + 1]] = [updatedTasks[index + 1], updatedTasks[index]];
-      setTasks(updatedTasks);
-      await updateTaskOrderInDB(updatedTasks);
-    }
-  };
-
-  const updateTaskOrderInDB = async (updatedTasks) => {
+  const markAsDone = async (id, done) => {
     try {
-      const tasksToUpdate = updatedTasks.map((task, index) => ({
-        _id: task._id,
-        order: index,
-      }));
-      await axios.put(`${serverUri}/todo/updateOrder`, { tasks: tasksToUpdate }, { withCredentials: true });
+      const res = await axios.put(`http://localhost:3000/todo/${id}/markDone`, { done: !done }); // Toggle done
+      setTasks(tasks.map(task => (task._id === id ? res.data : task))); // Update task state
     } catch (error) {
-      console.error("Error updating task order:", error);
+      console.log(error);
     }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
-    return date.toLocaleString('en-US', options);
   };
 
   return (
@@ -231,11 +198,16 @@ const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
                 <tr key={task._id}>
                   <td>{day}</td>
                   <td>{dateParts.join(', ')}</td>
-                  <td className="task-cell">{task.Task}</td>
+                  <td className="task-cell" style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
+                    {task.Task}
+                  </td>
                   <td>
                     <button className='delete-btn' onClick={() => deleteTask(index, task._id)}>Delete</button>
                     <button className='move' onClick={() => moveTaskUp(index)}>👆</button>
                     <button className='move' onClick={() => moveTaskDown(index)}>👇</button>
+                    <button className='mark-done-btn' onClick={() => markAsDone(task._id, task.done)}>
+                      {task.done ? 'Undo' : 'Done'}
+                    </button>
                   </td>
                 </tr>
               );
@@ -252,3 +224,4 @@ const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
 };
 
 export default TodoApp;
+
