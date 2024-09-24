@@ -118,13 +118,14 @@ var serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
 export default TodoApp;
  */
 
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ThreeDots } from 'react-loader-spinner'; // Import the ThreeDots spinner
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
+  const [loading, setLoading] = useState(true); // Start loading as true
 
   // Define the server URI
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
@@ -132,19 +133,20 @@ const TodoApp = () => {
   const traceTask = (e) => {
     setNewTask(e.target.value);
   };
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+    return date.toLocaleString('en-US', options);
   };
-  return date.toLocaleString('en-US', options);
-};
 
   useEffect(() => {
     fetchTodos();
@@ -156,6 +158,8 @@ const formatDate = (dateString) => {
       setTasks(res.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching
     }
   };
 
@@ -236,32 +240,49 @@ const formatDate = (dateString) => {
           </tr>
         </thead>
         <tbody>
-          {tasks && tasks.length > 0 ? (
-            tasks.map((task, index) => {
-              const formattedDate = formatDate(task.createdAt);
-              const [day, ...dateParts] = formattedDate.split(', ');
-              return (
-                <tr key={task._id}>
-                  <td>{day}</td>
-                  <td>{dateParts.join(', ')}</td>
-                  <td className="task-cell" style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
-                    {task.Task}
-                  </td>
-                  <td>
-                    <button className='delete-btn' onClick={() => deleteTask(index, task._id)}>Delete</button>
-                    <button className='move' onClick={() => moveTaskUp(index)}>👆</button>
-                    <button className='move' onClick={() => moveTaskDown(index)}>👇</button>
-                    <button className='mark-done-btn' onClick={() => markAsDone(task._id, task.done)}>
-                      {task.done ? 'Undo' : 'Mark as Done'}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
+          {loading ? (
             <tr>
-              <td colSpan="4">You have no tasks yet</td>
+              <td colSpan="4" style={{ textAlign: 'center' }}>
+                <ThreeDots
+                  visible={true}
+                  height="80"
+                  width="80"
+                  color="#4fa94d"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </td>
             </tr>
+          ) : (
+            tasks && tasks.length > 0 ? (
+              tasks.map((task, index) => {
+                const formattedDate = formatDate(task.createdAt);
+                const [day, ...dateParts] = formattedDate.split(', ');
+                return (
+                  <tr key={task._id}>
+                    <td>{day}</td>
+                    <td>{dateParts.join(', ')}</td>
+                    <td className="task-cell" style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
+                      {task.Task}
+                    </td>
+                    <td>
+                      <button className='delete-btn' onClick={() => deleteTask(index, task._id)}>Delete</button>
+                      <button className='move' onClick={() => moveTaskUp(index)}>👆</button>
+                      <button className='move' onClick={() => moveTaskDown(index)}>👇</button>
+                      <button className='mark-done-btn' onClick={() => markAsDone(task._id, task.done)}>
+                        {task.done ? 'Undo' : 'Mark as Done'}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center' }}>You have no tasks yet</td>
+              </tr>
+            )
           )}
         </tbody>
       </table>
@@ -270,5 +291,3 @@ const formatDate = (dateString) => {
 };
 
 export default TodoApp;
-
-
