@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ThreeDots } from 'react-loader-spinner'; // Import the ThreeDots loader
-
+import './state.css';
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
@@ -114,7 +114,7 @@ const TodoApp = () => {
   if (loading) {
     return (
       <div className="loader">
-        <ThreeDots
+        <div><ThreeDots
           visible={true}
           height="80"
           width="80"
@@ -124,6 +124,7 @@ const TodoApp = () => {
           wrapperStyle={{}}
           wrapperClass=""
         />
+        </div>
       </div>
     );
   }
