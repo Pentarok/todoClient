@@ -252,7 +252,7 @@ const formatDate = (dateString) => {
                     <button className='move' onClick={() => moveTaskUp(index)}>👆</button>
                     <button className='move' onClick={() => moveTaskDown(index)}>👇</button>
                     <button className='mark-done-btn' onClick={() => markAsDone(task._id, task.done)}>
-                      {task.done ? 'Undo' : 'Done'}
+                      {task.done ? 'Undo' : 'Mark as Done'}
                     </button>
                   </td>
                 </tr>
