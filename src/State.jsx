@@ -8,7 +8,7 @@ const TodoApp = () => {
   const traceTask = (e) => {
     setNewTask(e.target.value);
   };
-
+const serverUri='https://todo-api-git-main-mak-pentaroks-projects.vercel.app/'
   useEffect(() => {
     console.log(tasks);
   }, [tasks]);
@@ -29,7 +29,7 @@ const TodoApp = () => {
   const addTask = async () => {
     if (newTask.trim() !== "") {
       try {
-        const res = await axios.post('http://localhost:3000/todo', { newTask }, { withCredentials: true });
+        const res = await axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true });
         console.log(res);
 
         const newTaskObject = { _id: res.data._id, Task: res.data.Task };
@@ -43,7 +43,7 @@ const TodoApp = () => {
 
   const deleteTask = async (index, id) => {
     try {
-      const res = await axios.delete(`http://localhost:3000/todo/${id}`); // Fixed string interpolation
+      const res = await axios.delete(`serverUri/todo/${id}`); // Fixed string interpolation
       console.log(res);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
@@ -83,7 +83,7 @@ const TodoApp = () => {
         order: index, // Set the order based on the current index
       }));
 
-      await axios.put('http://localhost:3000/todo/updateOrder', { tasks: tasksToUpdate }, { withCredentials: true });
+      await axios.put(`http://localhost:3000/todo/updateOrder`, { tasks: tasksToUpdate }, { withCredentials: true });
     } catch (error) {
       console.error("Error updating task order:", error);
     }
@@ -139,7 +139,7 @@ const TodoApp = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/todos');
+      const res = await axios.get(`${serverUri}/todos`);
       setTasks(res.data);
     } catch (error) {
       console.log(error);
@@ -153,7 +153,7 @@ const TodoApp = () => {
   const addTask = async () => {
     if (newTask.trim() !== "") {
       try {
-        const res = await axios.post('http://localhost:3000/todo', { newTask }, { withCredentials: true });
+        const res = await axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true });
         const newTaskObject = { _id: res.data._id, Task: res.data.Task, createdAt: res.data.createdAt };
         setTasks((t) => [...t, newTaskObject]);
         setNewTask('');
@@ -165,7 +165,7 @@ const TodoApp = () => {
 
   const deleteTask = async (index, id) => {
     try {
-      await axios.delete(`http://localhost:3000/todo/${id}`);
+      await axios.delete(`${serverUri}/todo/${id}`);
       setTasks(tasks.filter((_, i) => i !== index));
     } catch (error) {
       console.log(error);
@@ -196,7 +196,7 @@ const TodoApp = () => {
         _id: task._id,
         order: index,
       }));
-      await axios.put('http://localhost:3000/todo/updateOrder', { tasks: tasksToUpdate }, { withCredentials: true });
+      await axios.put(`${serverUri}/todo/updateOrder`, { tasks: tasksToUpdate }, { withCredentials: true });
     } catch (error) {
       console.error("Error updating task order:", error);
     }
