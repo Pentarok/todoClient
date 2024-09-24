@@ -154,7 +154,7 @@ const TodoApp = () => {
 
   const fetchTodos = async () => {
     try {
-      setLoadin(true)
+      setLoading(true)
       const res = await axios.get(`${serverUri}/todos`);
       setTasks(res.data);
       setLoading(false);
