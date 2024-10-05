@@ -1,43 +1,25 @@
-import { useState } from 'react';
-import Card from './Card.jsx';
-import List from './list.jsx';
-
-import Header from './Header.jsx';
-import {BrowserRouter, Routes, Route} from "react-router-dom";
-import './App.css';
-import profile from './assets/profile.jpg';
-import profile2 from './assets/profile2.jpg';
-import profile3 from './assets/profile3.jpg';
-import profile4 from './assets/profile4.jpg';
-import profile5 from './assets/profile5.jpg';
-
-import State from './State.jsx';
-import About from './About.jsx';
-import Contact from './Contact.jsx';
-import BlogList from './BlogList.jsx';
-import Footer from './Footer.jsx';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TodoApp from './State.jsx';
+import BlogList from './BlogList'; // Example import for BlogList component
+import About from './About'; // Example import for About component
+import Contact from './Contact'; // Example import for Contact component
+import NotFound from './NotFound'; // A new NotFound component for undefined routes
+
 function App() {
-
-
   return (
-
     <>
-
-    <BrowserRouter>
-   
-    <Routes>
-      <Route path='/' element={<BlogList/>}></Route>
-      <Route path='/about' element={<About/>}></Route>
-      <Route path='/todo' element={<TodoApp/>}></Route>
-      <Route path='/contact' element={<Contact/>}></Route>
-    </Routes>
- 
-    </BrowserRouter>
-
-
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<BlogList />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/todo' element={<TodoApp />} />
+          <Route path='/contact' element={<Contact />} />
+          {/* Catch-all route for undefined paths */}
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </>
-    
   );
 }
 
