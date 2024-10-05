@@ -9,7 +9,7 @@ const TodoApp = () => {
   const [newTask, setNewTask] = useState('');
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
 
-  const serverUri = 'http://localhost:3000';
+
 
   const traceTask = (e) => {
     setNewTask(e.target.value);
