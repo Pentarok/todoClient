@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { ThreeDots } from 'react-loader-spinner'; // Import the ThreeDots loader
+import { useQuery, useMutation, QueryClient, useQueryClient } from '@tanstack/react-query';
+import { ThreeDots } from 'react-loader-spinner'; // Import the loader
 import './state.css';
 
 const TodoApp = () => {
-  const [tasks, setTasks] = useState([]);
+  const queryClient = useQueryClient();
   const [newTask, setNewTask] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  // Define the server URI
   const serverUri = 'https://todo-api-git-main-mak-pentaroks-projects.vercel.app';
+
+  const serverUri = 'http://localhost:3000';
 
   const traceTask = (e) => {
     setNewTask(e.target.value);
@@ -29,105 +29,44 @@ const TodoApp = () => {
     return date.toLocaleString('en-US', options);
   };
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  // Fetch tasks using React Query
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["todos"],
+    queryFn: () =>
+      fetch(`${serverUri}/todos`).then((res) => res.json()),
+  
+  });
 
-  const fetchTodos = async () => {
-    try {
-      setLoading(true); // Start loading
-      const res = await axios.get(`${serverUri}/todos`);
-      setTasks(res.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false); // End loading
+  // Add new task mutation
+  const { mutate, isPending } = useMutation({
+
+    mutationFn: async () => {
+      console.log(isPending);
+      return axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true });
+      console.log(isPending);    
+    },
+    onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["todos"]});
+      console.log(isPending);
+      setNewTask("");
     }
-  };
+  });
+// Define the delete mutation
+const deleteMutation = useMutation({
+  mutationFn: (taskId) => {
+    return axios.delete(`${serverUri}/todo/${taskId}`);
+  },
+  onSuccess: () => {
+    // Invalidate and refetch todos after delete
+    queryClient.invalidateQueries({queryKey:["todos"]});
+  },
+  onError: (error) => {
+    console.error("Error deleting task:", error);
+  }
+});
 
-  const addTask = () => {
-    if (newTask.trim() !== '') {
-      const newTaskObject = {
-        _id: Date.now().toString(), // Temporary ID for fast UI updates
-        Task: newTask,
-        createdAt: new Date(),
-        done: false,
-      };
-      setTasks((prevTasks) => [...prevTasks, newTaskObject]);
-      setNewTask('');
-
-      // Update the server in the background
-      axios.post(`${serverUri}/todo`, { newTask }, { withCredentials: true })
-        .then((res) => {
-          // Replace temporary task with task from server
-          setTasks((prevTasks) =>
-            prevTasks.map((task) =>
-              task._id === newTaskObject._id ? { ...task, _id: res.data._id } : task
-            )
-          );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  };
-
-  const deleteTask = (index, id) => {
-    // Remove task from UI first
-    setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
-
-    // Update the server in the background
-    axios.delete(`${serverUri}/todo/${id}`)
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const markAsDone = (id, done) => {
-    // Optimistically update the UI
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => (task._id === id ? { ...task, done: !done } : task))
-    );
-
-    // Update the server in the background
-    axios.put(`${serverUri}/todo/${id}/markDone`, { done: !done })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const moveTaskUp = (index) => {
-    if (index > 0) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index - 1]] = [updatedTasks[index - 1], updatedTasks[index]];
-      setTasks(updatedTasks);
-      updateTaskOrderInDB(updatedTasks);
-    }
-  };
-
-  const moveTaskDown = (index) => {
-    if (index < tasks.length - 1) {
-      const updatedTasks = [...tasks];
-      [updatedTasks[index], updatedTasks[index + 1]] = [updatedTasks[index + 1], updatedTasks[index]];
-      setTasks(updatedTasks);
-      updateTaskOrderInDB(updatedTasks);
-    }
-  };
-
-  const updateTaskOrderInDB = (updatedTasks) => {
-    const tasksToUpdate = updatedTasks.map((task, index) => ({
-      _id: task._id,
-      order: index,
-    }));
-
-    // Update the server in the background
-    axios.put(`${serverUri}/todo/updateOrder`, { tasks: tasksToUpdate }, { withCredentials: true })
-      .catch((error) => {
-        console.error("Error updating task order:", error);
-      });
-  };
-
-  if (loading) {
+  // Check loading state
+  if (isLoading) {
     return (
       <div className="loader">
         <ThreeDots
@@ -137,18 +76,32 @@ const TodoApp = () => {
           color="#4fa94d"
           radius="9"
           ariaLabel="three-dots-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
         />
       </div>
     );
   }
 
+  // Handle error state
+  if (error) {
+    return <div>An error occurred! Reload the page</div>;
+  }
+
+  // Check if data is undefined or empty
   return (
     <div className="list-container">
       <h2 className="header">To-Do List App</h2>
-      <input type="text" value={newTask} placeholder="Enter task..." onChange={traceTask} />
-      <button className="btn add-btn" onClick={addTask}>Add Task</button>
+      <input
+        type="text"
+        value={newTask}
+        placeholder="Enter task..."
+        onChange={traceTask}
+      />
+  {isPending 
+  ?
+  <p>Adding task</p>
+  :
+  <button className="btn add-btn" onClick={mutate}>Add Task</button>
+  }
       <table>
         <thead>
           <tr>
@@ -159,8 +112,8 @@ const TodoApp = () => {
           </tr>
         </thead>
         <tbody>
-          {tasks.length > 0 ? (
-            tasks.map((task, index) => {
+          {data && data.length > 0 ? (
+            data.map((task, index) => {
               const formattedDate = formatDate(task.createdAt);
               const [day, ...dateParts] = formattedDate.split(', ');
               return (
@@ -171,12 +124,8 @@ const TodoApp = () => {
                     {task.Task}
                   </td>
                   <td>
-                    <button className="delete-btn" onClick={() => deleteTask(index, task._id)}>Delete</button>
-                    <button className="move" onClick={() => moveTaskUp(index)}>👆</button>
-                    <button className="move" onClick={() => moveTaskDown(index)}>👇</button>
-                    <button className="mark-done-btn" onClick={() => markAsDone(task._id, task.done)}>
-                      {task.done ? 'Undo' : 'Mark as Done'}
-                    </button>
+                    {/* Your action buttons here */}
+                    <button className="delete-btn" onClick={()=>deleteMutation.mutate(task._id)}>Delete</button>
                   </td>
                 </tr>
               );
